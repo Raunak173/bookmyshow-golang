@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -129,4 +130,53 @@ func GetVenueByID(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"venue": venue,
 	})
+}
+
+type ShowTimingsBody struct {
+	ShowTimings []string `json:"show_timings"`
+	MovieId     uint     `json:"movie_id"`
+}
+
+func AddShowTimings(c *gin.Context) {
+	venueID := c.Param("id")
+	var body ShowTimingsBody
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid movie IDs"})
+		return
+	}
+	//We are checking we are authorized or not
+	user, _ := c.Get("user")
+	//We get userDetails, because we need to check that we are admin or not
+	userDetails := user.(models.User)
+	if !userDetails.IsAdmin {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized, admin access required"})
+		return
+	}
+	//Check if venue exists
+	var venue models.Venue
+	if err := initializers.Db.First(&venue, venueID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Venue not found"})
+		return
+	}
+	// Validate the movie ID
+	var movie models.Movie
+	if err := initializers.Db.First(&movie, body.MovieId).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Movie not found"})
+		return
+	}
+	// Add show timings
+	for _, timingStr := range body.ShowTimings {
+		// Create a new ShowTime record
+		showTime := models.ShowTime{
+			Timing:  timingStr,
+			MovieID: body.MovieId, // Associate with the movie
+			VenueID: venue.ID,     // Associate with the venue
+		}
+		// Save the show time record
+		if err := initializers.Db.Create(&showTime).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error saving show time for %s: %v", timingStr, err)})
+			return
+		}
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Show timings added successfully"})
 }

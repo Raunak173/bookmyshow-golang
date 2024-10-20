@@ -94,3 +94,46 @@ func GetMovieByID(c *gin.Context) {
 		"movie": movie,
 	})
 }
+
+type VenueWithShowTimes struct {
+	VenueID   uint              `json:"venue_id"`
+	VenueName string            `json:"venue_name"`
+	ShowTimes []models.ShowTime `json:"show_times"`
+}
+
+func GetVenuesByMovieID(c *gin.Context) {
+	movieID := c.Param("id")
+	var showTimes []models.ShowTime
+	/// Retrieve the show times for the given movie ID, preloading the associated venue and movie
+	if err := initializers.Db.Preload("Venue").Preload("Movie").Where("movie_id = ?", movieID).Find(&showTimes).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No showtimes found for this movie"})
+		return
+	}
+	// Create a map to club venues with their show times
+	venueMap := make(map[uint]gin.H)
+	for _, showTime := range showTimes {
+		venueID := showTime.Venue.ID
+		// Check if the venue is already added to the map
+		if venue, exists := venueMap[venueID]; exists {
+			// If venue already exists, append the new show time
+			venue["show_times"] = append(venue["show_times"].([]string), showTime.Timing)
+		} else {
+			// If venue doesn't exist, add it to the map with the first show time
+			venueMap[venueID] = gin.H{
+				"id":         showTime.Venue.ID,
+				"name":       showTime.Venue.Name,
+				"location":   showTime.Venue.Location,
+				"show_times": []string{showTime.Timing},
+			}
+		}
+	}
+	// Convert the map to a list for the response
+	var venues []gin.H
+	for _, venue := range venueMap {
+		venues = append(venues, venue)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"movie_id": movieID,
+		"venues":   venues,
+	})
+}

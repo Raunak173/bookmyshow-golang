@@ -13,5 +13,6 @@ func VenueRoutes(c *gin.Engine) {
 		Venue.POST("/", middleware.RequireAuth, controllers.CreateVenue)
 		Venue.POST("/:id/movies/add", middleware.RequireAuth, controllers.AddMoviesInVenue)
 		Venue.GET("/:id", controllers.GetVenueByID)
+		Venue.POST("/:id/timings/add", middleware.RequireAuth, controllers.AddShowTimings)
 	}
 }

@@ -1,6 +1,8 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type Movie struct {
 	gorm.Model
@@ -12,4 +14,7 @@ type Movie struct {
 	//Movie -> Venue (Many to Many)
 
 	Venues []Venue `gorm:"many2many:movie_venues;"`
+
+	//One movie can have multiple show timings
+	ShowTimes []ShowTime `json:"show_times"`
 }
