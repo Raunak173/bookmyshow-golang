@@ -79,3 +79,18 @@ func CreateMovie(c *gin.Context) {
 		"movie": movie,
 	})
 }
+
+func GetMovieByID(c *gin.Context) {
+	movieID := c.Param("id")
+	// Declare a variable to hold the movie data
+	var movie models.Movie
+	// Retrieve the movie with its associated venues using GORM's Preload
+	if err := initializers.Db.Preload("Venues").First(&movie, movieID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Movie not found"})
+		return
+	}
+	// Return the movie along with its venues
+	c.JSON(http.StatusOK, gin.H{
+		"movie": movie,
+	})
+}

@@ -11,5 +11,6 @@ func MovieRoutes(c *gin.Engine) {
 	{
 		Movie.GET("/", controllers.GetAllMovies)
 		Movie.POST("/", middleware.RequireAuth, controllers.CreateMovie)
+		Movie.GET("/:id", controllers.GetMovieByID)
 	}
 }
