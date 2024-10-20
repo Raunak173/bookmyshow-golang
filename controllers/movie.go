@@ -33,7 +33,7 @@ func GetAllMovies(c *gin.Context) {
 	initializers.Db.Model(&models.Movie{}).Count(&totalMovies)
 	nextOffset := offset + limit
 	if nextOffset >= int(totalMovies) {
-		nextOffset = -1 // No more tasks to load
+		nextOffset = -1 // No more movies to load
 	}
 	c.JSON(200, gin.H{
 		"movies":      movies,

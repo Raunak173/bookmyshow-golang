@@ -17,5 +17,6 @@ var R = gin.Default()
 func main() {
 	routes.MovieRoutes(R)
 	routes.UserRoutes(R)
+	routes.VenueRoutes(R)
 	R.Run()
 }
