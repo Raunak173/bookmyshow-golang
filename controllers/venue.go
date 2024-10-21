@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/raunak173/bms-go/helpers"
 	"github.com/raunak173/bms-go/initializers"
 	"github.com/raunak173/bms-go/models"
 )
@@ -177,6 +178,14 @@ func AddShowTimings(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error saving show time for %s: %v", timingStr, err)})
 			return
 		}
+		// Generate the default seat layout for this showtime
+		seats := helpers.GenerateSeatsForShowTime(showTime.ID)
+		// Save the generated seats to the database
+		if err := initializers.Db.Create(&seats).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error generating seats for %s: %v", timingStr, err)})
+			return
+		}
 	}
+
 	c.JSON(http.StatusOK, gin.H{"message": "Show timings added successfully"})
 }

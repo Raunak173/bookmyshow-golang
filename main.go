@@ -18,5 +18,6 @@ func main() {
 	routes.MovieRoutes(R)
 	routes.UserRoutes(R)
 	routes.VenueRoutes(R)
+	routes.SeatRoutes(R)
 	R.Run()
 }

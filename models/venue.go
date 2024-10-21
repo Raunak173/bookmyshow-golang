@@ -25,4 +25,7 @@ type ShowTime struct {
 
 	VenueID uint  `json:"venue_id"`
 	Venue   Venue `json:"venue"`
+
+	//One showtime can have many seats
+	Seats []Seat `json:"seats" gorm:"foreignKey:ShowTimeID"`
 }

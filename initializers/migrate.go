@@ -8,5 +8,6 @@ func SyncDB() {
 		&models.User{},
 		&models.Venue{},
 		&models.ShowTime{},
+		&models.Seat{},
 	)
 }

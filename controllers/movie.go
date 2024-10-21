@@ -110,6 +110,7 @@ func GetVenuesByMovieID(c *gin.Context) {
 		return
 	}
 	// Create a map to club venues with their show times
+	//Creating a map of venueId : object
 	venueMap := make(map[uint]gin.H)
 	for _, showTime := range showTimes {
 		venueID := showTime.Venue.ID
@@ -123,6 +124,7 @@ func GetVenuesByMovieID(c *gin.Context) {
 				"id":         showTime.Venue.ID,
 				"name":       showTime.Venue.Name,
 				"location":   showTime.Venue.Location,
+				"movie_name": showTime.Movie.Title,
 				"show_times": []string{showTime.Timing},
 			}
 		}
@@ -133,7 +135,6 @@ func GetVenuesByMovieID(c *gin.Context) {
 		venues = append(venues, venue)
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"movie_id": movieID,
-		"venues":   venues,
+		"venues": venues,
 	})
 }
