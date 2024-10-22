@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/raunak173/bms-go/initializers"
 	"github.com/raunak173/bms-go/models"
 )
 
@@ -70,3 +71,27 @@ func CreateSeatMatrix(seats []models.Seat) map[string][]map[string]interface{} {
 // 	  {"seat_number": "B1", "is_reserved": false, "is_booked": false, "is_available": true, "price": 250},
 // 	]
 //   }
+
+// UnreserveSeats unreserves the seats after the specified duration
+func UnReserveSeats(seatIDs []uint, duration time.Duration) {
+	time.Sleep(duration)
+
+	tx := initializers.Db.Begin()
+
+	for _, seatID := range seatIDs {
+		var seat models.Seat
+		if err := tx.First(&seat, seatID).Error; err != nil {
+			tx.Rollback()
+			return
+		}
+
+		// Unreserve if the seat is still reserved but not booked
+		if seat.IsReserved && !seat.IsBooked {
+			seat.IsReserved = false
+			seat.IsAvailable = true
+			tx.Save(&seat)
+		}
+	}
+
+	tx.Commit()
+}

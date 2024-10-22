@@ -15,3 +15,13 @@ type Seat struct {
 	ShowTimeID uint     `json:"showtime_id"`
 	ShowTime   ShowTime `json:"showtime" gorm:"foreignKey:ShowTimeID"`
 }
+
+type Order struct {
+	gorm.Model
+	UserID     uint    `json:"user_id"`
+	ShowTimeID uint    `json:"showtime_id"`
+	TotalPrice float32 `json:"total_price"`
+
+	// One order can have multiple seats
+	Seats []Seat `json:"seats" gorm:"many2many:order_seats;"`
+}

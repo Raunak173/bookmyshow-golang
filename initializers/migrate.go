@@ -9,5 +9,6 @@ func SyncDB() {
 		&models.Venue{},
 		&models.ShowTime{},
 		&models.Seat{},
+		&models.Order{},
 	)
 }
