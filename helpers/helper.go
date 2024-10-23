@@ -1,11 +1,15 @@
 package helpers
 
 import (
+	"errors"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/raunak173/bms-go/initializers"
 	"github.com/raunak173/bms-go/models"
+	"github.com/twilio/twilio-go"
+	openapi "github.com/twilio/twilio-go/rest/verify/v2"
 )
 
 func FormatShowTime(t time.Time) string {
@@ -94,4 +98,47 @@ func UnReserveSeats(seatIDs []uint, duration time.Duration) {
 	}
 
 	tx.Commit()
+}
+
+var accountSID = os.Getenv("TWILIO_ACCOUNT_SID")
+var authToken = os.Getenv("TWILIO_AUTH_TOKEN")
+var serviceId = os.Getenv("TWILIO_SERVICE_SID")
+
+var client *twilio.RestClient = twilio.NewRestClientWithParams(twilio.ClientParams{
+	Username: accountSID,
+	Password: authToken,
+})
+
+func SendOtp(phone string) (string, error) {
+	to := "+91" + phone
+	params := &openapi.CreateVerificationParams{}
+	params.SetTo(to)
+	params.SetChannel("sms")
+
+	resp, err := client.VerifyV2.CreateVerification(serviceId, params)
+	if err != nil {
+		fmt.Println(err.Error())
+		return "", errors.New("otp failed to generate")
+	} else {
+		fmt.Printf("Sent verification '%s'\n", *resp.Sid)
+		return *resp.Sid, nil
+	}
+}
+
+func CheckOtp(phone, code string) error {
+	to := "+91" + phone
+	params := &openapi.CreateVerificationCheckParams{}
+	params.SetTo(to)
+	params.SetCode(code)
+
+	resp, err := client.VerifyV2.CreateVerificationCheck(serviceId, params)
+
+	if err != nil {
+		fmt.Println(err.Error())
+		return errors.New("invalid otp")
+	} else if *resp.Status == "approved" {
+		return nil
+	} else {
+		return errors.New("invalid otp")
+	}
 }
