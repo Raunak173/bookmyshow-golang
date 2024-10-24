@@ -19,5 +19,6 @@ func main() {
 	routes.UserRoutes(R)
 	routes.VenueRoutes(R)
 	routes.SeatRoutes(R)
+	routes.OrderRoutes(R)
 	R.Run()
 }

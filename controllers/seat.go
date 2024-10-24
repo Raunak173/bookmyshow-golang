@@ -93,7 +93,6 @@ func BookSeats(c *gin.Context) {
 
 	//We are checking we are authorized or not
 	user, _ := c.Get("user")
-	//We get userDetails, because we need to check that we are admin or not
 	userDetails := user.(models.User)
 	userId := userDetails.ID
 
