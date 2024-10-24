@@ -121,6 +121,13 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	// Send OTP for login
+	_, otpErr := helpers.SendOtp(user.PhoneNumber)
+	if otpErr != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to send OTP"})
+		return
+	}
+
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email or password"})
@@ -141,13 +148,6 @@ func Login(c *gin.Context) {
 	// Set the token in a cookie
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("Authorization", tokenString, 3600*24*7, "", "", false, true)
-
-	// Send OTP for login
-	_, otpErr := helpers.SendOtp(user.PhoneNumber)
-	if otpErr != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to send OTP"})
-		return
-	}
 
 	// Return success response
 	c.JSON(http.StatusOK, gin.H{
