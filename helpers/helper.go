@@ -100,16 +100,17 @@ func UnReserveSeats(seatIDs []uint, duration time.Duration) {
 	tx.Commit()
 }
 
-var accountSID = os.Getenv("TWILIO_ACCOUNT_SID")
-var authToken = os.Getenv("TWILIO_AUTH_TOKEN")
-var serviceId = os.Getenv("TWILIO_SERVICE_SID")
-
-var client *twilio.RestClient = twilio.NewRestClientWithParams(twilio.ClientParams{
-	Username: accountSID,
-	Password: authToken,
-})
-
 func SendOtp(phone string) (string, error) {
+
+	accountSID := os.Getenv("TWILIO_ACCOUNT_SID")
+	authToken := os.Getenv("TWILIO_AUTH_TOKEN")
+	serviceId := os.Getenv("TWILIO_SERVICE_SID")
+
+	var client *twilio.RestClient = twilio.NewRestClientWithParams(twilio.ClientParams{
+		Username: accountSID,
+		Password: authToken,
+	})
+
 	to := "+91" + phone
 	params := &openapi.CreateVerificationParams{}
 	params.SetTo(to)
@@ -126,6 +127,16 @@ func SendOtp(phone string) (string, error) {
 }
 
 func CheckOtp(phone, code string) error {
+
+	accountSID := os.Getenv("TWILIO_ACCOUNT_SID")
+	authToken := os.Getenv("TWILIO_AUTH_TOKEN")
+	serviceId := os.Getenv("TWILIO_SERVICE_SID")
+
+	var client *twilio.RestClient = twilio.NewRestClientWithParams(twilio.ClientParams{
+		Username: accountSID,
+		Password: authToken,
+	})
+
 	to := "+91" + phone
 	params := &openapi.CreateVerificationCheckParams{}
 	params.SetTo(to)
