@@ -1,6 +1,6 @@
 # Movie Booking Service
 
-This app is a movie booking service where users can browse current movies, select a venue, choose seats, and make reservations. After confirming a booking, users log in or register to proceed. The app manages seat availability, ensuring race conditions are handled during booking, with a 10-minute window to complete the payment before seats are released. Admins can manage venues, movies, showtimes, and bookings. Currently, the app does not support OTP or email verification, but I am planning to soon add this feature.
+This app is a movie booking service where users can browse current movies, select a venue, choose seats, and make reservations. After confirming a booking, users log in or register to proceed. The app manages seat availability, ensuring race conditions are handled during booking, with a 10-minute window to complete the payment before seats are released. Admins can manage venues, movies, showtimes, and bookings. It also has otp verification using twilio
 
 ## Customer User Journey
 
