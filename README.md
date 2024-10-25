@@ -6,6 +6,8 @@ I had also dockerised it as: https://hub.docker.com/repository/docker/raunak173/
 
 Also deployed it on AWS EC2 instance at http://ec2-13-232-146-41.ap-south-1.compute.amazonaws.com
 
+The Database used is AWS RDS Postgresql 
+
 ## Customer User Journey
 
 1. **Movie Selection**: 
