@@ -44,10 +44,11 @@ func SignUp(c *gin.Context) {
 
 	// Create the user
 	user := models.User{
-		Name:     body.Name,
-		Email:    body.Email,
-		Password: string(hash),
-		IsAdmin:  false,
+		Name:        body.Name,
+		Email:       body.Email,
+		Password:    string(hash),
+		PhoneNumber: body.PhoneNumber,
+		IsAdmin:     false,
 	}
 
 	// Save the user to the database
@@ -57,16 +58,9 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
-	// Generate and send OTP
-	if _, err := helpers.SendOtp(body.PhoneNumber); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to send OTP"})
-		return
-	}
-
 	// Return the created user as a response
 	c.JSON(http.StatusCreated, gin.H{
-		"user":    user,
-		"message": "OTP sent to your phone. Please verify.",
+		"user": user,
 	})
 }
 
