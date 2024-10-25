@@ -1,6 +1,10 @@
 # Movie Booking Service
 
-This app is a movie booking service where users can browse current movies, select a venue, choose seats, and make reservations. After confirming a booking, users log in or register to proceed. The app manages seat availability, ensuring race conditions are handled during booking, with a 10-minute window to complete the payment before seats are released. Admins can manage venues, movies, showtimes, and bookings. It also has otp verification using twilio
+This app is a movie booking service where users can browse current movies, select a venue, choose seats, and make reservations. After confirming a booking, users log in or register to proceed. The app manages seat availability, ensuring race conditions are handled during booking, with a 10-minute window to complete the payment before seats are released. Admins can manage venues, movies, showtimes, and bookings. It also has otp verification using twilio.
+
+I had also dockerised it as: https://hub.docker.com/repository/docker/raunak173/bms/general
+
+Also deployed it on AWS EC2 instance at http://ec2-13-232-146-41.ap-south-1.compute.amazonaws.com
 
 ## Customer User Journey
 
