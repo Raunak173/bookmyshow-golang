@@ -91,6 +91,15 @@ func AddMoviesInVenue(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid movie IDs"})
 		return
 	}
+	// Check for unique movie IDs
+	uniqueIDs := make(map[uint]bool)   //A map of integer movie id and bool isPresent
+	for _, id := range body.MovieIDs { //Range in a slice is returning index and value at that index
+		if uniqueIDs[id] { //for each key by default we have false
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Duplicate movie IDs found"})
+			return
+		}
+		uniqueIDs[id] = true
+	}
 	//We are checking we are authorized or not
 	user, _ := c.Get("user")
 	//We get userDetails, because we need to check that we are admin or not

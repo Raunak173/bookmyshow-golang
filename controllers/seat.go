@@ -39,6 +39,16 @@ func ReserveSeats(c *gin.Context) {
 		return
 	}
 
+	// Check for unique seat ids
+	uniqueIDs := make(map[uint]bool)
+	for _, id := range request.Seats {
+		if uniqueIDs[id] {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Duplicate seat IDs found"})
+			return
+		}
+		uniqueIDs[id] = true
+	}
+
 	// Start a GORM transaction
 	tx := initializers.Db.Begin()
 
@@ -89,6 +99,16 @@ func BookSeats(c *gin.Context) {
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
+	}
+
+	// Check for unique seat ids
+	uniqueIDs := make(map[uint]bool)
+	for _, id := range request.Seats {
+		if uniqueIDs[id] {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Duplicate seat IDs found"})
+			return
+		}
+		uniqueIDs[id] = true
 	}
 
 	//We are checking we are authorized or not
