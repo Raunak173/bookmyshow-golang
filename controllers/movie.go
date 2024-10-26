@@ -27,17 +27,36 @@ func GetAllMovies(c *gin.Context) {
 			offset = parsedOffset
 		}
 	}
-	initializers.Db.
-		Limit(limit).Offset(offset).Find(&movies)
+	name := ""
+	n := c.Query("name")
+	if n != "" {
+		name = n
+	}
+	query := initializers.Db.Model(&models.Movie{})
+	if name != "" {
+		query = query.Where("title ILIKE ?", "%"+name+"%") // ILIKE for case-insensitive search
+	}
+	// Now my query will have movies with particular name only, now we will add pagination on that query only
+	sort := "asc"
+	s := c.Query("sort")
+	if s == "desc" {
+		sort = "desc"
+	}
+
 	var totalMovies int64
-	initializers.Db.Model(&models.Movie{}).Count(&totalMovies)
+	query.Count(&totalMovies)
+	//We will count total movies also relevant to the query
+
+	query.Limit(limit).Offset(offset).Order("title " + sort).Find(&movies)
+	// query.Limit(limit).Offset(offset).Find(&movies)
 	nextOffset := offset + limit
 	if nextOffset >= int(totalMovies) {
 		nextOffset = -1 // No more movies to load
 	}
 	c.JSON(200, gin.H{
-		"movies":      movies,
-		"next_offset": nextOffset,
+		"movies":       movies,
+		"total_movies": totalMovies,
+		"next_offset":  nextOffset,
 	})
 }
 
