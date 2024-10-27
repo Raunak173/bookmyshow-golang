@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/raunak173/bms-go/helpers"
 	"github.com/raunak173/bms-go/initializers"
 	"github.com/raunak173/bms-go/models"
 )
@@ -155,5 +156,57 @@ func GetVenuesByMovieID(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"venues": venues,
+	})
+}
+
+func UploadMoviePoster(c *gin.Context) {
+	user, _ := c.Get("user")
+	//We get userDetails, because we need to check that we are admin or not
+	userDetails := user.(models.User)
+	if !userDetails.IsAdmin {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized, admin access required"})
+		return
+	}
+	form, err := c.MultipartForm()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	// Get the file headers
+	// Check if the "poster" key exists and has at least one file
+	files, exists := form.File["poster"]
+	if !exists || len(files) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No file uploaded under 'poster' key"})
+		return
+	}
+	// Save the first file in the form (assuming single file upload)
+	fileHeader := files[0]
+	f, err := fileHeader.Open()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Error opening file"})
+		return
+	}
+	defer f.Close()
+	uploadedURL, err := helpers.SaveFile(f, fileHeader)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Error saving file"})
+		return
+	}
+	// Retrieve the movie ID from the form (assuming it's passed as "movie_id")
+	movieID := c.Param("id")
+	var movie models.Movie
+	if err := initializers.Db.First(&movie, "id = ?", movieID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Movie not found"})
+		return
+	}
+
+	// Update the Movie's Poster field with the uploaded URL
+	movie.Poster = uploadedURL
+	if err := initializers.Db.Save(&movie).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save movie poster URL"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"url": uploadedURL,
 	})
 }

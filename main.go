@@ -10,6 +10,7 @@ func init() {
 	initializers.LoadEnv()
 	initializers.ConnectToDB()
 	initializers.SyncDB()
+	initializers.CreateAWSUploader()
 }
 
 var R = gin.Default()

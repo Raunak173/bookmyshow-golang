@@ -3,9 +3,13 @@ package helpers
 import (
 	"errors"
 	"fmt"
+	"io"
+	"mime/multipart"
 	"os"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/raunak173/bms-go/initializers"
 	"github.com/raunak173/bms-go/models"
 	"github.com/twilio/twilio-go"
@@ -152,4 +156,24 @@ func CheckOtp(phone, code string) error {
 	} else {
 		return errors.New("invalid otp")
 	}
+}
+
+// Function to save file to aws
+func SaveFile(fileReader io.Reader, fileHeader *multipart.FileHeader) (string, error) {
+
+	bucketName := os.Getenv("AWS_BUCKET_NAME")
+
+	_, err := initializers.Uploader.Upload(&s3manager.UploadInput{
+		Bucket: aws.String(bucketName),
+		Key:    aws.String(fileHeader.Filename),
+		Body:   fileReader,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	// Get the URL of the uploaded file
+	url := fmt.Sprintf("https://%s.s3.amazonaws.com/%s", bucketName, fileHeader.Filename)
+
+	return url, nil
 }
