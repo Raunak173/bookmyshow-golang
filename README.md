@@ -8,6 +8,8 @@ Also deployed it on AWS EC2 instance at http://ec2-13-232-146-41.ap-south-1.comp
 
 The Database used is AWS RDS Postgresql 
 
+Postman Collection: https://www.postman.com/mission-geoscientist-67700153/workspace/raunak-public-apis/collection/28779130-2fc604b8-a41f-4957-b586-ea10091712a7?action=share&creator=28779130
+
 ## Customer User Journey
 
 1. **Movie Selection**: 
